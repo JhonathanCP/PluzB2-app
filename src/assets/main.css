@@ -1,0 +1,33 @@
+*{
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.bg-login{
+    background-color: #3058A1;
+}
+
+.title-login{
+    color: #FBC63B
+}
+
+/* src/components/Footer.css */
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #FBC63B; /* Puedes ajustar el color según el diseño */
+    padding: 0.5rem;
+    text-align: center;
+}
+
+.container {
+    max-width: 1140px;
+    margin: 0 auto;
+}
+
+.footer p {
+    margin: 0;
+    color: #1B376F; /* Puedes ajustar el color del texto según el diseño */
+}
