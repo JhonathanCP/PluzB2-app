@@ -3,10 +3,10 @@ import axios from "axios";
 const URL =
     process.env.NODE_ENV === "production"
         ? import.meta.env.VITE_BACKEND_URL
-        : "http://localhost:4500/user";
+        : "http://localhost:4500/group";
 
 const authApi = axios.create({
-    baseURL: 'http://localhost:4500/user',
+    baseURL: 'http://localhost:4500/group',
 });
 
 // Interceptor para incluir el token en los encabezados de todas las solicitudes
@@ -18,6 +18,8 @@ authApi.interceptors.request.use((config) => {
     return config;
 });
 
-export const getUsers = () => authApi.get("/");
-export const getUser = (userId) => authApi.get(`/${userId}/`);
-export const updateUser = (userId, data) => authApi.put(`/${userId}/`, data);
+export const getGroups = () => authApi.get("/");
+export const getGroup = (userId) => authApi.get(`/${userId}/`);
+export const createGroup = (data) => authApi.post("/", data);
+export const updateGroup = (userId, data) => authApi.put(`/${userId}/`, data);
+export const deleteGroup = (userId) => authApi.delete(`/${userId}/`);

@@ -5,10 +5,17 @@ import '../assets/main.css'; // Asegúrate de crear este archivo para los estilo
 
 export const FooterComponent = () => {
     return (
-        <footer className="footer">
-            <div className="container text-center">
-                <p className="mb-0 fw-bold">© Pluz Energía Perú S.A.A.</p>
-            </div>
-        </footer>
+        <footer className="fixed-bottom text-white px-0 m-0 footer" style={{ minHeight: '2vh' }}>
+                <div className='container-fluid'>
+                    <div className='row d-flex d-sm-none px-2'>
+                        <div className="col-6 text-start">© PLUZ</div>
+                        <div className="col-6 text-end">Versión: 1.0.0</div>
+                    </div>
+                    <div className='row d-none d-md-flex px-2'>
+                        <div className="col-10 text-start">© PLUZ Energía Perú S.A.A.</div>
+                        <div className="col-2 text-end">Versión: 1.0.0</div>
+                    </div>
+                </div>
+            </footer>
     );
 };

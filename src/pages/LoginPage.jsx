@@ -46,8 +46,7 @@ export const LoginPage = () => {
     return (
         <Container fluid className='bg-login'>
             <Container fluid className='d-flex flex-column justify-content-center align-items-center vh-100'>
-                <h3 className='text-center title-login text-uppercase fw-bold'>Sistema</h3>
-                <h3 className='text-center mb-4 title-login text-uppercase fw-bold'>Informativo de Clientes</h3>
+                <h3 className='text-center title-login fw-bold'>Buyer Profile</h3>
                 <Card style={{ width: '20rem' }}>
                     <Card.Body>
                         <Card.Title className='text-center mb-4'>

@@ -1,14 +1,12 @@
-// src/components/Navbar.jsx
-
 import React, { useEffect, useState } from 'react';
-import { Navbar, Nav } from 'react-bootstrap';
+import { Navbar, Nav, NavDropdown } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode'; // Corrige la importación
+import { jwtDecode } from 'jwt-decode'; // Corrige la importación si es necesario
 import Logo from '../assets/Logo-blanco.png'; // Asegúrate de que la ruta sea correcta
 import { toast } from 'react-hot-toast';
 import { getGroups } from '../api/group.api.js'; // Importa la API para obtener los grupos
 
-export const NavbarComponent = () => {
+export const AdminNavbarComponent = () => {
     const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [groups, setGroups] = useState([]); // Estado para almacenar los grupos
@@ -64,8 +62,8 @@ export const NavbarComponent = () => {
     };
 
     return (
-        <Navbar variant="dark" expand="lg" className="fixed-top px-5 bg-login">
-            <Navbar.Brand as={Link} to="/menu">
+        <Navbar variant="dark" expand="lg" className="px-5 bg-login">
+            <Navbar.Brand as={Link} to="/">
                 <img
                     src={Logo}
                     width="80"
@@ -85,6 +83,17 @@ export const NavbarComponent = () => {
                             <i className={`bi bi-${group.icon}`}></i> {group.name}
                         </Nav.Link>
                     ))}
+                    <NavDropdown title="Configuración" id="admin-config-dropdown">
+                        <NavDropdown.Item as={Link} to="/admin/groups">
+                            <i className="bi bi-people-fill"></i> Grupos
+                        </NavDropdown.Item>
+                        <NavDropdown.Item as={Link} to="/admin/clients">
+                            <i className="bi bi-person-fill"></i> Clientes
+                        </NavDropdown.Item>
+                        <NavDropdown.Item as={Link} to="/admin/users">
+                            <i className="bi bi-gear-fill"></i> Usuarios
+                        </NavDropdown.Item>
+                    </NavDropdown>
                     <span className="nav-link">
                         <i className="bi bi-person-circle"></i> {username || 'Usuario'}
                     </span>

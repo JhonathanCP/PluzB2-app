@@ -3,6 +3,7 @@ import React from 'react';
 import { Toaster } from 'react-hot-toast';
 import { LoginPage } from './pages/LoginPage';
 import { MenuPage } from './pages/user/MenuPage';
+import { GroupPage } from './pages/user/GroupPage';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -19,7 +20,8 @@ function App() {
                 <Route path="/" element={<Navigate to="/login" />} />
                 <Route path="/*" element={<Navigate to="/login" />} />
                 <Route element={<PrivateRoutes />}>
-                  <Route path="/menu" element={<MenuPage />} />
+                    <Route path="/menu" element={<MenuPage />} />
+                    <Route path="/group/:id" element={<GroupPage />} />
                     <Route element={<AdminRoutes />}>
                     </Route>
                 </Route>
