@@ -12,14 +12,14 @@ const AdminRoutes = () => {
         if (decodedToken) {
             try {
                 const role = decodedToken.role;
-                if (role === 1 ) {
+                if (role == 1 ) {
                     return true; // El usuario es admin o moderator
                 }
             } catch (error) {
                 console.error("Error al decodificar el token:", error);
             }
         }
-
+        console.log('noes')
         return false; // El usuario no es admin ni moderator o no ha iniciado sesión
     };
 
