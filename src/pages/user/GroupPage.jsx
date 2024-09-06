@@ -134,7 +134,7 @@ export const GroupPage = () => {
             <Container fluid className='mt-5 p-5'>
                 <h2 className='text-center'>Clientes {groupName}</h2>
                 <section id="clients">
-                    <Table striped bordered hover>
+                    <Table responsive striped bordered hover>
                         <thead>
                             <tr>
                                 <th>ID</th>

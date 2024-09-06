@@ -81,7 +81,7 @@ export const NavbarComponent = () => {
                         <i className="bi bi-house-fill"></i> Inicio
                     </Nav.Link>
                     {groups.map((group) => (
-                        <Nav.Link as={Link} to={`/group/${group.id}`} key={group.id}>
+                        <Nav.Link as={Link} onClick={() => navigate(`/client/${id}`)} key={group.id}>
                             <i className={`bi bi-${group.icon}`}></i> {group.name}
                         </Nav.Link>
                     ))}

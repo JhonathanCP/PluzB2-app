@@ -1,7 +1,7 @@
 import { Outlet, Navigate } from 'react-router-dom';
 import { jwtDecode } from "jwt-decode";
 
-const AdminRoutes = () => {
+export const AdminRoutes = () => {
     const isAdmin = () => {
         // Implementa la lógica para verificar si el usuario ha iniciado sesión
         const accessToken = localStorage.getItem('access');        
@@ -25,5 +25,3 @@ const AdminRoutes = () => {
 
     return isAdmin() ? <Outlet /> : <Navigate to="/menu" />;
 };
-
-export default AdminRoutes;
