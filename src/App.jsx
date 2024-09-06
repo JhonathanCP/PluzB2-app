@@ -12,8 +12,8 @@ import { AdminUsersPage } from './pages/admin/AdminUserPage';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import PrivateRoutes from './components/PrivateRoutes';
-import AdminRoutes from './components/AdminRoutes';
+import { PrivateRoutes } from './components/PrivateRoutes';
+import { AdminRoutes } from './components/AdminRoutes';
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 
@@ -23,7 +23,7 @@ function App() {
             <Routes>
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/" element={<Navigate to="/login" />} />
-                <Route path="/*" element={<Navigate to="/login" />} />
+                <Route path="/*" element={<Navigate to="/menu" />} />
                 <Route element={<PrivateRoutes />}>
                     <Route path="/menu" element={<MenuPage />} />
                     <Route path="/group/:id" element={<GroupPage />} />
