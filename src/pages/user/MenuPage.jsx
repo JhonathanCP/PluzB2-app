@@ -40,6 +40,7 @@ export const MenuPage = () => {
 
     return (
         <Container fluid className='p-0'>
+            
             <NavbarComponent />
 
             <Container fluid className='banner-container'>
@@ -69,7 +70,7 @@ export const MenuPage = () => {
                             >
                                 <div className="service-item">
                                     <div className="icon">
-                                        <i className={`bi bi-${group.icon}`} style={{ color: '#1A3EC1' }}></i>
+                                        <i className={`bi bi-${group.icon}`} style={{ color: '#3058a1' }}></i>
                                     </div>
                                     <h3>{group.name}</h3>
                                 </div>

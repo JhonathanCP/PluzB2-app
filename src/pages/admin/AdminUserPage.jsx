@@ -1,7 +1,7 @@
 // src/pages/AdminUsersPage.jsx
 
 import React, { useState, useEffect } from 'react';
-import { Container, Table, Button, Modal, Form, Spinner } from 'react-bootstrap';
+import { Container, Table, Button, Modal, Form, Spinner, Row, Col } from 'react-bootstrap';
 import { getUsers, createUser, updateUser, deleteUser } from '../../api/user.api';
 import { getRoles } from '../../api/role.api';
 import { NavbarComponent } from '../../components/NavbarComponent';
@@ -52,13 +52,19 @@ export const AdminUsersPage = () => {
     return (
         <Container fluid className='p-0'>
             <NavbarComponent />
-            <Container className='mt-5 pt-5'>
-                <h1>Administrar Usuarios</h1>
-                <Button onClick={() => handleShowModal()}>Crear Usuario</Button>
-                <Table striped bordered hover className='mt-3'>
+            <Container fluid className='mt-5 p-5'>
+                <Row>
+                    <Col xs={7} md={9}>
+                        <h1>Administrar Usuarios</h1>
+                    </Col>
+                    <Col xs={5} md={3}>
+                        <Button onClick={() => handleShowModal()}>Crear Usuario</Button>
+                    </Col>
+                </Row>
+                <Table responsive striped bordered hover className='mt-3'>
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            {/* <th>ID</th> */}
                             <th>Nombre de Usuario</th>
                             <th>Email</th>
                             <th>Rol</th>
@@ -68,7 +74,7 @@ export const AdminUsersPage = () => {
                     <tbody>
                         {users.map(user => (
                             <tr key={user.id}>
-                                <td>{user.id}</td>
+                                {/* <td>{user.id}</td> */}
                                 <td>{user.username}</td>
                                 <td>{user.email}</td>
                                 <td>{roles.find(role => role.id === user.roleId)?.name}</td>
@@ -83,7 +89,7 @@ export const AdminUsersPage = () => {
             </Container>
             <FooterComponent />
 
-            <Modal show={showModal} onHide={() => setShowModal(false)}>
+            <Modal show={showModal} onHide={() => setShowModal(false)} size='xl' centered>
                 <Modal.Header closeButton>
                     <Modal.Title>{selectedUser ? 'Editar Usuario' : 'Crear Usuario'}</Modal.Title>
                 </Modal.Header>
@@ -103,14 +109,6 @@ export const AdminUsersPage = () => {
                                 type='email'
                                 value={selectedUser?.email || ''}
                                 onChange={e => setSelectedUser({ ...selectedUser, email: e.target.value })}
-                            />
-                        </Form.Group>
-                        <Form.Group controlId='password'>
-                            <Form.Label>Contraseña</Form.Label>
-                            <Form.Control
-                                type='password'
-                                value={selectedUser?.password || ''}
-                                onChange={e => setSelectedUser({ ...selectedUser, password: e.target.value })}
                             />
                         </Form.Group>
                         <Form.Group controlId='role'>

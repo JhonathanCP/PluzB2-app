@@ -1,7 +1,5 @@
-// src/components/Navbar.jsx
-
 import React, { useEffect, useState } from 'react';
-import { Navbar, Nav } from 'react-bootstrap';
+import { Navbar, Nav, NavDropdown } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode'; // Corrige la importación
 import Logo from '../assets/Logo-blanco.png'; // Asegúrate de que la ruta sea correcta
@@ -12,6 +10,7 @@ export const NavbarComponent = () => {
     const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [groups, setGroups] = useState([]); // Estado para almacenar los grupos
+    const [isAdmin, setIsAdmin] = useState(false); // Estado para verificar si el usuario es administrador
 
     useEffect(() => {
         // Obtener el token desde el localStorage
@@ -19,6 +18,7 @@ export const NavbarComponent = () => {
         if (accessToken) {
             const decodedToken = jwtDecode(accessToken);
             setUsername(decodedToken.username);
+            setIsAdmin(decodedToken.role == 1); // Asumimos que `isAdmin` está en el token
 
             // Configurar un timer para manejar la expiración del token
             const currentTime = Math.floor(Date.now() / 1000);
@@ -85,6 +85,25 @@ export const NavbarComponent = () => {
                             <i className={`bi bi-${group.icon}`}></i> {group.name}
                         </Nav.Link>
                     ))}
+                    {isAdmin && ( // Mostrar solo si es administrador
+                        <NavDropdown title="Configuración" id="admin-config-dropdown">
+                            <NavDropdown.Item as={Link} to="/admin/user">
+                                <i className="bi bi-people-fill"></i> Usuarios
+                            </NavDropdown.Item>
+                            <NavDropdown.Item as={Link} to="/admin/locations">
+                                <i className="bi bi-geo-alt-fill"></i> Locaciones
+                            </NavDropdown.Item>
+                            <NavDropdown.Item as={Link} to="/admin/groups">
+                                <i className="bi bi-collection-fill"></i> Grupos
+                            </NavDropdown.Item>
+                            <NavDropdown.Item as={Link} to="/admin/clients">
+                                <i className="bi bi-briefcase-fill"></i> Clientes
+                            </NavDropdown.Item>
+                            <NavDropdown.Item as={Link} to="/admin/section-types">
+                                <i className="bi bi-bar-chart-steps"></i> Criterios
+                            </NavDropdown.Item>
+                        </NavDropdown>
+                    )}
                     <span className="nav-link">
                         <i className="bi bi-person-circle"></i> {username || 'Usuario'}
                     </span>

@@ -1,5 +1,3 @@
-// src/pages/GroupPage.jsx
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Container, Table, Button, Modal, Spinner } from 'react-bootstrap';
@@ -58,6 +56,41 @@ export const GroupPage = () => {
         fetchClientsAndLocationsAndSections();
     }, [id]);
 
+    const getBackgroundColor = (percepcion) => {
+        // Clamps the value to be between 0 and 100
+        const clampedPercepcion = Math.max(0, Math.min(percepcion, 100));
+        
+        // Define colors
+        const green = { r: 102, g: 174, b: 94 }; // #66ae5e
+        const yellow = { r: 251, g: 198, b: 59 }; // #fbc63b
+        const gray = { r: 211, g: 211, b: 211 }; // #d3d3d3
+    
+        let color;
+    
+        if (clampedPercepcion < 50) {
+            // Transition from gray (red) to yellow
+            const ratio = clampedPercepcion / 50;
+            color = {
+                r: Math.round(gray.r + ratio * (yellow.r - gray.r)),
+                g: Math.round(gray.g + ratio * (yellow.g - gray.g)),
+                b: Math.round(gray.b + ratio * (yellow.b - gray.b))
+            };
+        } else {
+            // Transition from yellow to green
+            const ratio = (clampedPercepcion - 50) / 50;
+            color = {
+                r: Math.round(yellow.r + ratio * (green.r - yellow.r)),
+                g: Math.round(yellow.g + ratio * (green.g - yellow.g)),
+                b: Math.round(yellow.b + ratio * (green.b - yellow.b))
+            };
+        }
+    
+        // Set alpha to 0.2 for transparency
+        return `rgba(${color.r}, ${color.g}, ${color.b}, 0.3)`;
+    };
+    
+    
+
     const handleShowDetails = (client) => {
         setSelectedClient(client);
         setShowModal(true);
@@ -73,13 +106,17 @@ export const GroupPage = () => {
         return location ? location.name : 'Unknown';
     };
 
-    const getSectionTypeName = (sectionTypeId) => {
-        const sectionType = sectionTypes.find(type => type.id === sectionTypeId);
-        return sectionType ? sectionType.name : 'Unknown';
-    };
-
     const getClientSections = (clientId) => {
         return sections.filter(section => section.clientId === clientId);
+    };
+
+    const getSectionsByType = (clientId) => {
+        const clientSections = getClientSections(clientId);
+        const groupedByType = sectionTypes.map(type => ({
+            sectionType: type.name,
+            sections: clientSections.filter(section => section.sectionTypeId === type.id),
+        }));
+        return groupedByType;
     };
 
     if (loading) {
@@ -95,13 +132,13 @@ export const GroupPage = () => {
             <NavbarComponent />
 
             <Container fluid className='mt-5 p-5'>
-                <h2 className='text-center'>{groupName}</h2>
+                <h2 className='text-center'>Clientes {groupName}</h2>
                 <section id="clients">
                     <Table striped bordered hover>
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Name</th>
+                                <th>Nombre</th>
                                 <th>Responsable</th>
                                 <th>Ubicación</th>
                                 <th>Acciones</th>
@@ -122,7 +159,7 @@ export const GroupPage = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="5" className='text-center'>No clients found for this group.</td>
+                                    <td colSpan="5" className='text-center'>No se encontraron clientes para este grupo.</td>
                                 </tr>
                             )}
                         </tbody>
@@ -140,44 +177,32 @@ export const GroupPage = () => {
                 <Modal.Body>
                     {selectedClient && (
                         <>
-                            <p><strong>ID:</strong> {selectedClient.id}</p>
+                            {/* <p><strong>ID:</strong> {selectedClient.id}</p> */}
                             <p><strong>Nombre:</strong> {selectedClient.name}</p>
                             <p><strong>Responsable:</strong> {selectedClient.responsible}</p>
-                            <p><strong>Descripción:</strong> {selectedClient.description}</p>
                             <p><strong>Ubicación:</strong> {getLocationName(selectedClient.locationId)}</p>
 
-                            {/* Secciones del cliente */}
-                            <h5>Información clave</h5>
-                            {getClientSections(selectedClient.id).length > 0 ? (
-                                <Table striped bordered hover>
-                                    <thead>
-                                        <tr>
-                                            <th>Criterio</th>
-                                            <th>Nombre</th>
-                                            <th>Percepción</th>
-                                            <th>KPI Name</th>
-                                            <th>KPI Referencia</th>
-                                            <th>KPI Value</th>
-                                            {/* <th>Activo</th> */}
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {getClientSections(selectedClient.id).map(section => (
-                                            <tr key={section.id}>
-                                                <td>{getSectionTypeName(section.sectionTypeId)}</td>
-                                                <td>{section.name}</td>
-                                                <td>{section.percepcion}</td>
-                                                <td>{section.kpiname}</td>
-                                                <td>{section.kpireferencia}</td>
-                                                <td>{section.kpivalue}</td>
-                                                {/* <td>{section.active ? 'Sí' : 'No'}</td> */}
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </Table>
-                            ) : (
-                                <p>No secciones found for this client.</p>
-                            )}
+                            {/* Secciones agrupadas por tipo */}
+                            <h5 className='fw-bold'>Información clave:</h5>
+                            {getSectionsByType(selectedClient.id).map(group => (
+                                group.sections.length > 0 && (
+                                    <div key={group.sectionType} className='pt-2'>
+                                        <h6 className='fw-bold'>{group.sectionType}</h6>
+                                        <div className="row g-3 justify-content-center">
+                                            {group.sections.map(section => (
+                                                <div className="col-lg-4 col-md-6 col-sm-12" key={section.id}>
+                                                    <div className="card h-100" style={{ background: getBackgroundColor(section.percepcion) }}>
+                                                        <div className="card-body">
+                                                            <h5 className="card-title">{section.name}</h5>
+                                                            <p className="card-text"><strong>Percepción:</strong> {section.percepcion}%</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )
+                            ))}
                         </>
                     )}
                 </Modal.Body>

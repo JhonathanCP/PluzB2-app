@@ -1,9 +1,10 @@
 /* Colors */
 :root {
     --color-default: hsl(0, 0%, 13%);
-    --color-primary: #1A3EC1;
-    --color-secondary: #11213F;
-    --color-background-system: #FBFCFE;
+    --color-primary: #3058a1;
+    --color-secondary: #fbc63b;
+    --color-terciary: #66ae5e;
+    --color-background-system: #f8f8f8;
 }
 
 /* Smooth scroll behavior */
@@ -16,7 +17,7 @@
   --------------------------------------------------------------*/
 
 .bg-login {
-    background-color: var(--color-secondary);
+    background-color: var(--color-primary);
 }
 
 section {
@@ -70,9 +71,9 @@ section {
 }
 
 /*--------------------------------------------------------------
-  # Our Services Section
-  --------------------------------------------------------------*/
-  .services {
+# Our Services Section
+--------------------------------------------------------------*/
+.services {
     min-height: 45vh;
     display: flex;
     align-items: center;
@@ -85,7 +86,7 @@ section {
     margin: 0;
 }
 
-  
+
 .services .service-item {
     padding: 30px;
     background: #fff;
@@ -418,7 +419,7 @@ section {
 
 .icon {
     font-size: 2rem;
-    color: #007bff;
+    color: var(--color-secondary);
     /*margin-bottom: 15px;*/
 }
 
@@ -473,6 +474,7 @@ body {
 .banner-container {
     flex: 1;
 }
+
 /*******login****/
 .container-background-login {
     display: flex;

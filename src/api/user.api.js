@@ -20,6 +20,6 @@ authApi.interceptors.request.use((config) => {
 
 export const getUsers = () => authApi.get("/");
 export const getUser = (userId) => authApi.get(`/${userId}/`);
-export const createUser = (data) => axios.post('/', data);
-export const updateUser = (id, data) => axios.put(`/${id}`, data);
-export const deleteUser = (id) => axios.delete(`/${id}`);
+export const createUser = (data) => authApi.post('/', data);
+export const updateUser = (id, data) => authApi.put(`/${id}`, data);
+export const deleteUser = (id) => authApi.delete(`/${id}`);

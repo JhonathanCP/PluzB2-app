@@ -4,6 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import { LoginPage } from './pages/LoginPage';
 import { MenuPage } from './pages/user/MenuPage';
 import { GroupPage } from './pages/user/GroupPage';
+import { AdminGroupsPage } from './pages/admin/AdminGroupsPage';
 import { AdminClientsPage } from './pages/admin/AdminClientsPage';
 import { AdminSectionTypesPage } from './pages/admin/AdminSectionTypesPage';
 import { AdminLocationsPage } from './pages/admin/AdminLocationPage';
@@ -28,6 +29,7 @@ function App() {
                     <Route path="/group/:id" element={<GroupPage />} />
                     <Route element={<AdminRoutes />}>
                         <Route path="/admin/user" element={<AdminUsersPage />} />
+                        <Route path="/admin/groups" element={<AdminGroupsPage />} />
                         <Route path="/admin/clients" element={<AdminClientsPage />} />
                         <Route path="/admin/section-types" element={<AdminSectionTypesPage />} />
                         <Route path="/admin/locations" element={<AdminLocationsPage />} />

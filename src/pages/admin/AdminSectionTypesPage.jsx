@@ -1,7 +1,7 @@
 // src/pages/AdminSectionTypesPage.jsx
 
 import React, { useState, useEffect } from 'react';
-import { Container, Table, Button, Modal, Form, Spinner } from 'react-bootstrap';
+import { Container, Table, Button, Modal, Form, Spinner, Row, Col } from 'react-bootstrap';
 import { getSectionTypes, createSectionType, updateSectionType, deleteSectionType } from '../../api/sectionType.api';
 import { NavbarComponent } from '../../components/NavbarComponent';
 import { FooterComponent } from '../../components/FooterComponent';
@@ -48,10 +48,16 @@ export const AdminSectionTypesPage = () => {
     return (
         <Container fluid className='p-0'>
             <NavbarComponent />
-            <Container className='mt-5 pt-5'>
-                <h1>Administrar criterios</h1>
-                <Button onClick={() => handleShowModal()}>Crear criterio</Button>
-                <Table striped bordered hover className='mt-3'>
+            <Container fluid className='mt-5 p-5'>
+                <Row>
+                    <Col xs={7} md={10}>
+                        <h1>Administrar criterios</h1>
+                    </Col>
+                    <Col xs={5} md={2}>
+                        <Button onClick={() => handleShowModal()}>Crear criterio</Button>
+                    </Col>
+                </Row>
+                <Table responsive striped bordered hover className='mt-3'>
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -75,7 +81,7 @@ export const AdminSectionTypesPage = () => {
             </Container>
             <FooterComponent />
 
-            <Modal show={showModal} onHide={() => setShowModal(false)}>
+            <Modal show={showModal} onHide={() => setShowModal(false)} size='xl' centered>
                 <Modal.Header closeButton>
                     <Modal.Title>{selectedSectionType ? 'Editar Tipo de Sección' : 'Crear Tipo de Sección'}</Modal.Title>
                 </Modal.Header>
