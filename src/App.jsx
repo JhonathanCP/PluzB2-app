@@ -15,6 +15,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { PrivateRoutes } from './components/PrivateRoutes';
 import { AdminRoutes } from './components/AdminRoutes';
 import "bootstrap-icons/font/bootstrap-icons.css";
+import { GroupServicesPage } from './pages/user/GroupServicesPage';
 
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
                 <Route path="/*" element={<Navigate to="/menu" />} />
                 <Route element={<PrivateRoutes />}>
                     <Route path="/menu" element={<MenuPage />} />
+                    <Route path="/group/:id/services" element={<GroupServicesPage/ >}/>
                     <Route path="/group/:id" element={<GroupPage />} />
                     <Route element={<AdminRoutes />}>
                         <Route path="/admin/user" element={<AdminUsersPage />} />

@@ -755,3 +755,7 @@ body {
     /* Cambia el color del texto al hacer hover */
     cursor: pointer
 }
+
+.service-card {
+    background-color: var(--color-primary)
+}

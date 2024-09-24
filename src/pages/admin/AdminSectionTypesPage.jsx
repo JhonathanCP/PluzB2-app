@@ -1,6 +1,5 @@
-// src/pages/AdminSectionTypesPage.jsx
-
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-hot-toast';
 import { Container, Table, Button, Modal, Form, Spinner, Row, Col } from 'react-bootstrap';
 import { getSectionTypes, createSectionType, updateSectionType, deleteSectionType } from '../../api/sectionType.api';
 import { NavbarComponent } from '../../components/NavbarComponent';
@@ -26,19 +25,33 @@ export const AdminSectionTypesPage = () => {
         setShowModal(true);
     };
 
-    const handleSaveSectionType = async () => {
+    const handleSaveSectionType = async (event) => {
+        event.preventDefault();
+        
+        // Validar que el campo "nombre" esté lleno
+        if (!selectedSectionType?.name || selectedSectionType.name.trim() === '') {
+            toast.error('Por favor, completa el campo de nombre.');
+            return; // Detener el envío del formulario si el campo está vacío
+        }
+
         if (selectedSectionType.id) {
             await updateSectionType(selectedSectionType.id, selectedSectionType);
+            toast.success('Criterio actualizado correctamente!');
         } else {
             await createSectionType(selectedSectionType);
+            toast.success('Criterio creado correctamente!');
         }
         setShowModal(false);
-        window.location.reload(); // Recargar la página para ver los cambios
+        // Refrescar la lista de tipos de sección
+        const sectionTypesResponse = await getSectionTypes();
+        setSectionTypes(sectionTypesResponse.data);
     };
 
     const handleDeleteSectionType = async (sectionTypeId) => {
         await deleteSectionType(sectionTypeId);
-        setSectionTypes(sectionTypes.filter(sectionType => sectionType.id !== sectionTypeId));
+        const updatedSectionTypes = sectionTypes.filter(sectionType => sectionType.id !== sectionTypeId);
+        setSectionTypes(updatedSectionTypes);
+        toast.success('Criterio eliminado correctamente!');
     };
 
     if (loading) {
@@ -51,16 +64,16 @@ export const AdminSectionTypesPage = () => {
             <Container fluid className='mt-5 p-5'>
                 <Row>
                     <Col xs={7} md={10}>
-                        <h1>Administrar criterios</h1>
+                        <h1>Administrar Criterios</h1>
                     </Col>
                     <Col xs={5} md={2}>
-                        <Button onClick={() => handleShowModal()}>Crear criterio</Button>
+                        <Button onClick={() => handleShowModal()}>Crear Criterio</Button>
                     </Col>
                 </Row>
-                <Table responsive striped bordered hover className='mt-3'>
+                <Table striped bordered hover className='mt-3'>
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            {/* <th>ID</th> */}
                             <th>Nombre</th>
                             <th>Acciones</th>
                         </tr>
@@ -68,11 +81,11 @@ export const AdminSectionTypesPage = () => {
                     <tbody>
                         {sectionTypes.map(sectionType => (
                             <tr key={sectionType.id}>
-                                <td>{sectionType.id}</td>
+                                {/* <td>{location.id}</td> */}
                                 <td>{sectionType.name}</td>
                                 <td>
                                     <Button onClick={() => handleShowModal(sectionType)}>Editar</Button>{' '}
-                                    <Button variant='danger' onClick={() => handleDeleteSectionType(sectionType.id)}>Eliminar</Button>
+                                    <Button variant="danger" onClick={() => handleDeleteSectionType(sectionType.id)}>Eliminar</Button>
                                 </td>
                             </tr>
                         ))}
@@ -83,10 +96,10 @@ export const AdminSectionTypesPage = () => {
 
             <Modal show={showModal} onHide={() => setShowModal(false)} size='xl' centered>
                 <Modal.Header closeButton>
-                    <Modal.Title>{selectedSectionType ? 'Editar Tipo de Sección' : 'Crear Tipo de Sección'}</Modal.Title>
+                    <Modal.Title>{selectedSectionType ? 'Editar Criterio' : 'Crear Criterio'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Form>
+                    <Form onSubmit={handleSaveSectionType}>
                         <Form.Group controlId='name'>
                             <Form.Label>Nombre</Form.Label>
                             <Form.Control
@@ -102,7 +115,7 @@ export const AdminSectionTypesPage = () => {
                         Cerrar
                     </Button>
                     <Button variant='primary' onClick={handleSaveSectionType}>
-                        {selectedSectionType ? 'Guardar Cambios' : 'Crear Tipo de Sección'}
+                        {selectedSectionType ? 'Guardar Cambios' : 'Crear Criterio'}
                     </Button>
                 </Modal.Footer>
             </Modal>

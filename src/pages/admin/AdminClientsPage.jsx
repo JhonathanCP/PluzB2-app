@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-hot-toast'
 import { Container, Table, Button, Modal, Form, Spinner, Row, Col } from 'react-bootstrap';
 import { getClients, createClient, updateClient } from '../../api/client.api';
+import { getGroups } from '../../api/group.api';
 import { getSections, createSection, deleteSection, updateSection } from '../../api/section.api';
 import { getLocations } from '../../api/location.api';
 import { getSectionTypes } from '../../api/sectionType.api'; // Para obtener los tipos de secciones
@@ -9,6 +11,7 @@ import { FooterComponent } from '../../components/FooterComponent';
 
 export const AdminClientsPage = () => {
     const [clients, setClients] = useState([]);
+    const [groups, setGroups] = useState([]);
     const [locations, setLocations] = useState([]);
     const [sections, setSections] = useState([]);
     const [sectionTypes, setSectionTypes] = useState([]); // Lista de tipos de secciones
@@ -21,10 +24,12 @@ export const AdminClientsPage = () => {
     useEffect(() => {
         const fetchData = async () => {
             const clientsResponse = await getClients();
+            const groupsResponse = await getGroups();
             const locationsResponse = await getLocations();
             const sectionsResponse = await getSections();
             const sectionTypesResponse = await getSectionTypes(); // Obtener tipos de secciones
             setClients(clientsResponse.data);
+            setGroups(groupsResponse.data);
             setLocations(locationsResponse.data);
             setSections(sectionsResponse.data);
             setSectionTypes(sectionTypesResponse.data); // Guardar tipos de secciones
@@ -43,12 +48,16 @@ export const AdminClientsPage = () => {
             await updateClient(selectedClient.id, selectedClient);
             // Actualizar la lista de clientes después de la edición
             setClients(clients.map(client => client.id === selectedClient.id ? selectedClient : client));
+            toast.success('Cliente actualizado correctamente!');
         } else {
             const newClient = await createClient(selectedClient);
             // Agregar el nuevo cliente a la lista de clientes
             setClients([...clients, newClient.data]);
+            toast.success('Cliente creado correctamente!');
         }
         setShowModal(false);
+        const clientsResponse = await getClients();
+        setClients(clientsResponse.data);
     };
 
     const handleShowSectionModal = (section = null, sectionTypeId = null) => {
@@ -68,11 +77,13 @@ export const AdminClientsPage = () => {
             await updateSection(selectedSection.id, sectionData);
             // Actualizar la lista de secciones después de la edición
             setSections(sections.map(section => section.id === selectedSection.id ? sectionData : section));
+            toast.success('Indicador actualizado correctamente!');
         } else {
             // Si es una nueva sección (es creación)
             const newSection = await createSection(sectionData);
             // Agregar la nueva sección a la lista de secciones
             setSections([...sections, newSection.data]);
+            toast.success('Indicador creado correctamente!');
         }
         setShowSectionModal(false);
     };
@@ -81,6 +92,7 @@ export const AdminClientsPage = () => {
         await deleteSection(sectionId);
         // Eliminar la sección de la lista de secciones
         setSections(sections.filter(section => section.id !== sectionId));
+        toast.success('Indicador eliminado correctamente!');
     };
 
     if (loading) {
@@ -106,6 +118,7 @@ export const AdminClientsPage = () => {
                             <th className='w-25'>Nombre</th>
                             <th className='w-25'>Responsable</th>
                             <th className='w-25'>Ubicación</th>
+                            <th className='w-25'>Grupo</th> {/* Columna para el grupo */}
                             <th className='w-25'>Acciones</th>
                         </tr>
                     </thead>
@@ -116,6 +129,7 @@ export const AdminClientsPage = () => {
                                 <td className='w-25'>{client.name}</td>
                                 <td className='w-25'>{client.responsible}</td>
                                 <td className='w-25'>{locations.find(loc => loc.id === client.locationId)?.name}</td>
+                                <td className='w-25'>{groups.find(group => group.id === client.groupId)?.name}</td> {/* Mostrar el nombre del grupo */}
                                 <td className='w-25'>
                                     <Button onClick={() => handleShowModal(client)}>Editar</Button>
                                 </td>
@@ -166,6 +180,23 @@ export const AdminClientsPage = () => {
                             </Form.Control>
                         </Form.Group>
 
+                        {/* Campo para seleccionar el grupo */}
+                        <Form.Group controlId='group'>
+                            <Form.Label>Grupo</Form.Label>
+                            <Form.Control
+                                as='select'
+                                value={selectedClient?.groupId || ''}
+                                onChange={e => setSelectedClient({ ...selectedClient, groupId: e.target.value })}
+                            >
+                                <option value=''>Selecciona un grupo</option>
+                                {groups.map(group => (
+                                    <option key={group.id} value={group.id}>
+                                        {group.name}
+                                    </option>
+                                ))}
+                            </Form.Control>
+                        </Form.Group>
+
                         {/* Agrupación de secciones por sectionType */}
                         <h5 className='pt-3'>Información clave del cliente</h5>
                         {sectionTypes.map(type => (
@@ -175,8 +206,13 @@ export const AdminClientsPage = () => {
                                         <h6>{type.name}</h6>
                                     </Col>
                                     <Col xs={6} lg={2}>
-                                        {/* Botón para agregar sección por sectionType */}
-                                        <Button onClick={() => handleShowSectionModal(null, type.id)}>Agregar Indicador</Button>
+                                        {/* Botón para agregar sección por sectionType, deshabilitado si no existe un cliente */}
+                                        <Button
+                                            onClick={() => handleShowSectionModal(null, type.id)}
+                                            disabled={!selectedClient?.id}  // Deshabilitar si el cliente no tiene id
+                                        >
+                                            Agregar Indicador
+                                        </Button>
                                     </Col>
                                 </Row>
                                 <Table striped bordered responsive>

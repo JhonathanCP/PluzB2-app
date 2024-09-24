@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Table, Button, Modal, Form, Spinner, Row,Col } from 'react-bootstrap';
+import { toast } from 'react-hot-toast';
+import { Container, Table, Button, Modal, Form, Spinner, Row, Col } from 'react-bootstrap';
 import { getLocations, createLocation, updateLocation, deleteLocation } from '../../api/location.api';
 import { NavbarComponent } from '../../components/NavbarComponent';
 import { FooterComponent } from '../../components/FooterComponent';
@@ -24,14 +25,24 @@ export const AdminLocationsPage = () => {
         setShowModal(true);
     };
 
-    const handleSaveLocation = async () => {
+    const handleSaveLocation = async (event) => {
+        event.preventDefault();
+
+        // Validar que todos los campos estén llenos
+        if (!selectedLocation?.name || !selectedLocation?.code || !selectedLocation?.responsible) {
+            toast.error('Por favor, completa todos los campos.');
+            return;
+        }
+
         if (selectedLocation.id) {
             await updateLocation(selectedLocation.id, selectedLocation);
+            toast.success('Ubicación actualizada correctamente!');
         } else {
             await createLocation(selectedLocation);
+            toast.success('Ubicación creada correctamente!');
         }
         setShowModal(false);
-        // Refresh locations
+        // Refrescar las ubicaciones
         const locationsResponse = await getLocations();
         setLocations(locationsResponse.data);
     };
@@ -40,6 +51,7 @@ export const AdminLocationsPage = () => {
         await deleteLocation(locationId);
         const updatedLocations = locations.filter(location => location.id !== locationId);
         setLocations(updatedLocations);
+        toast.success('Ubicación eliminada correctamente!');
     };
 
     if (loading) {
@@ -61,9 +73,8 @@ export const AdminLocationsPage = () => {
                 <Table striped bordered hover className='mt-3'>
                     <thead>
                         <tr>
-                            {/* <th>ID</th> */}
                             <th>Nombre</th>
-                            <th>Codigo</th>
+                            <th>Código</th>
                             <th>Alcalde</th>
                             <th>Acciones</th>
                         </tr>
@@ -71,7 +82,6 @@ export const AdminLocationsPage = () => {
                     <tbody>
                         {locations.map(location => (
                             <tr key={location.id}>
-                                {/* <td>{location.id}</td> */}
                                 <td>{location.name}</td>
                                 <td>{location.code}</td>
                                 <td>{location.responsible}</td>
@@ -91,7 +101,7 @@ export const AdminLocationsPage = () => {
                     <Modal.Title>{selectedLocation ? 'Editar Ubicación' : 'Crear Ubicación'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Form>
+                    <Form onSubmit={handleSaveLocation}>
                         <Form.Group controlId='name'>
                             <Form.Label>Nombre</Form.Label>
                             <Form.Control
@@ -116,17 +126,18 @@ export const AdminLocationsPage = () => {
                                 onChange={e => setSelectedLocation({ ...selectedLocation, responsible: e.target.value })}
                             />
                         </Form.Group>
+                        <Modal.Footer>
+                            <Button variant='secondary' onClick={() => setShowModal(false)}>
+                                Cerrar
+                            </Button>
+                            <Button variant='primary' type="submit">
+                                {selectedLocation ? 'Guardar Cambios' : 'Crear Ubicación'}
+                            </Button>
+                        </Modal.Footer>
                     </Form>
                 </Modal.Body>
-                <Modal.Footer>
-                    <Button variant='secondary' onClick={() => setShowModal(false)}>
-                        Cerrar
-                    </Button>
-                    <Button variant='primary' onClick={handleSaveLocation}>
-                        {selectedLocation ? 'Guardar Cambios' : 'Crear Ubicación'}
-                    </Button>
-                </Modal.Footer>
             </Modal>
+
         </Container>
     );
 };

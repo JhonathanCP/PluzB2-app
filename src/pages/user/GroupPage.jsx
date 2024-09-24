@@ -59,14 +59,14 @@ export const GroupPage = () => {
     const getBackgroundColor = (percepcion) => {
         // Clamps the value to be between 0 and 100
         const clampedPercepcion = Math.max(0, Math.min(percepcion, 100));
-        
+
         // Define colors
         const green = { r: 102, g: 174, b: 94 }; // #66ae5e
         const yellow = { r: 251, g: 198, b: 59 }; // #fbc63b
         const gray = { r: 211, g: 211, b: 211 }; // #d3d3d3
-    
+
         let color;
-    
+
         if (clampedPercepcion < 50) {
             // Transition from gray (red) to yellow
             const ratio = clampedPercepcion / 50;
@@ -84,12 +84,12 @@ export const GroupPage = () => {
                 b: Math.round(yellow.b + ratio * (green.b - yellow.b))
             };
         }
-    
+
         // Set alpha to 0.2 for transparency
         return `rgba(${color.r}, ${color.g}, ${color.b}, 0.3)`;
     };
-    
-    
+
+
 
     const handleShowDetails = (client) => {
         setSelectedClient(client);
@@ -178,31 +178,34 @@ export const GroupPage = () => {
                     {selectedClient && (
                         <>
                             {/* <p><strong>ID:</strong> {selectedClient.id}</p> */}
-                            <p><strong>Nombre:</strong> {selectedClient.name}</p>
-                            <p><strong>Responsable:</strong> {selectedClient.responsible}</p>
-                            <p><strong>Ubicación:</strong> {getLocationName(selectedClient.locationId)}</p>
+                            <h5><strong>Nombre:</strong> {selectedClient.name}</h5>
+                            <h5><strong>Responsable:</strong> {selectedClient.responsible}</h5>
+                            <h5><strong>Ubicación:</strong> {getLocationName(selectedClient.locationId)}</h5>
 
                             {/* Secciones agrupadas por tipo */}
                             <h5 className='fw-bold'>Información clave:</h5>
                             {getSectionsByType(selectedClient.id).map(group => (
                                 group.sections.length > 0 && (
                                     <div key={group.sectionType} className='pt-2'>
-                                        <h6 className='fw-bold'>{group.sectionType}</h6>
+                                        <h5 className='fw-bold'>{group.sectionType}</h5>
                                         <div className="row g-3 justify-content-center">
-                                            {group.sections.map(section => (
-                                                <div className="col-lg-4 col-md-6 col-sm-12" key={section.id}>
-                                                    <div className="card h-100" style={{ background: getBackgroundColor(section.percepcion) }}>
-                                                        <div className="card-body">
-                                                            <h5 className="card-title">{section.name}</h5>
-                                                            <p className="card-text"><strong>Percepción:</strong> {section.percepcion}%</p>
+                                            {group.sections
+                                                .sort((a, b) => b.percepcion - a.percepcion)  // Ordenar por percepción de mayor a menor
+                                                .map(section => (
+                                                    <div className="col-lg-4 col-md-6 col-sm-12" key={section.id}>
+                                                        <div className="card h-100" style={{ background: getBackgroundColor(section.percepcion) }}>
+                                                            <div className="card-body">
+                                                                <h5 className="card-title">{section.name}</h5>
+                                                                <p className="card-text"><strong>Percepción:</strong> {section.percepcion}%</p>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            ))}
+                                                ))}
                                         </div>
                                     </div>
                                 )
                             ))}
+
                         </>
                     )}
                 </Modal.Body>
