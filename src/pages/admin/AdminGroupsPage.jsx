@@ -3,7 +3,7 @@ import { toast } from 'react-hot-toast';
 import { Container, Table, Button, Modal, Form, Spinner, Row, Col } from 'react-bootstrap';
 import { getGroups, createGroup, updateGroup, deleteGroup } from '../../api/group.api';
 import { getGroupServices, createGroupService, updateGroupService, deleteGroupService } from '../../api/groupservices.api';
-import { getServiceSections, createServiceSection } from '../../api/servicesection.api'; // API para ServiceSection
+import { getServiceSections, createServiceSection, updateServiceSection, deleteServiceSection } from '../../api/servicesection.api'; // API para ServiceSection
 import { getSectionTypes } from '../../api/sectionType.api'; // API para SectionTypes
 import { NavbarComponent } from '../../components/NavbarComponent';
 import { FooterComponent } from '../../components/FooterComponent';
@@ -40,8 +40,14 @@ export const AdminGroupsPage = () => {
     };
 
     const fetchGroupServices = async (groupId) => {
-        const servicesResponse = await getGroupServices(groupId);
+        const servicesResponse = await getGroupServices(groupId); // Filtrar por groupId
         setGroupServices(servicesResponse.data);
+
+        // Obtener las secciones de servicios relacionadas a cada servicio
+        const allSections = await Promise.all(
+            servicesResponse.data.map(service => getServiceSections(service.id))
+        );
+        setServiceSections(allSections.flat());
     };
 
     const handleSaveGroup = async (event) => {
@@ -76,7 +82,15 @@ export const AdminGroupsPage = () => {
     // Funciones para los servicios del grupo
     const handleShowServiceModal = (service = null) => {
         setSelectedService(service);
+        if (service) {
+            fetchServiceSections(service.id); // Cargar secciones vinculadas a este servicio
+        }
         setShowServiceModal(true);
+    };
+
+    const fetchServiceSections = async (serviceId) => {
+        const sectionsResponse = await getServiceSections(serviceId); // Filtrar por serviceId
+        setServiceSections(sectionsResponse.data);
     };
 
     const handleSaveService = async (event) => {
@@ -101,8 +115,7 @@ export const AdminGroupsPage = () => {
             if (selectedSectionType) {
                 const serviceSectionData = {
                     name: `${createdService.data.name} - Sección`,
-                    groupId: selectedGroup.id,
-                    serviceId: createdService.data.id,
+                    groupServiceId: createdService.data.id, // Relacionar con el servicio creado
                     sectionTypeId: selectedSectionType.id, // Usar el tipo de sección seleccionado
                 };
                 await createServiceSection(serviceSectionData);
@@ -119,6 +132,13 @@ export const AdminGroupsPage = () => {
         const updatedServices = groupServices.filter(service => service.id !== serviceId);
         setGroupServices(updatedServices);
         toast.success('Servicio eliminado correctamente!');
+    };
+
+    const handleDeleteServiceSection = async (sectionId) => {
+        await deleteServiceSection(sectionId);
+        const updatedSections = serviceSections.filter(section => section.id !== sectionId);
+        setServiceSections(updatedSections);
+        toast.success('Sección de servicio eliminada correctamente!');
     };
 
     if (loading) {
@@ -195,7 +215,7 @@ export const AdminGroupsPage = () => {
                             />
                         </Form.Group>
 
-                        {/* Sección para los servicios del grupo */}
+                        {/* Mostrar las secciones de los servicios del grupo */}
                         {selectedGroup?.id && (
                             <>
                                 <h5 className='mt-4'>Servicios del Grupo</h5>
@@ -205,6 +225,7 @@ export const AdminGroupsPage = () => {
                                         <tr>
                                             <th>Nombre</th>
                                             <th>Descripción</th>
+                                            <th>Criterio (Tipo de Sección)</th>
                                             <th>Acciones</th>
                                         </tr>
                                     </thead>
@@ -213,6 +234,7 @@ export const AdminGroupsPage = () => {
                                             <tr key={service.id}>
                                                 <td>{service.name}</td>
                                                 <td>{service.description}</td>
+                                                <td>{service.sectionType?.name || 'Sin criterio asignado'}</td>
                                                 <td>
                                                     <Button onClick={() => handleShowServiceModal(service)}>Editar</Button>{' '}
                                                     <Button variant="danger" onClick={() => handleDeleteService(service.id)}>Eliminar</Button>
@@ -259,7 +281,7 @@ export const AdminGroupsPage = () => {
                             />
                         </Form.Group>
                         <Form.Group controlId='sectionType'>
-                            <Form.Label>Tipo de Sección</Form.Label>
+                            <Form.Label>Tipo de Sección (Criterio)</Form.Label>
                             <Form.Control
                                 as='select'
                                 value={selectedSectionType?.id || ''}
@@ -273,6 +295,27 @@ export const AdminGroupsPage = () => {
                                 ))}
                             </Form.Control>
                         </Form.Group>
+
+                        {/* Secciones vinculadas al servicio */}
+                        <h5 className='mt-4'>Secciones del Servicio</h5>
+                        <Table striped bordered hover className='mt-3'>
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {serviceSections.map(section => (
+                                    <tr key={section.id}>
+                                        <td>{section.name}</td>
+                                        <td>
+                                            <Button variant="danger" onClick={() => handleDeleteServiceSection(section.id)}>Eliminar Sección</Button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </Table>
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>

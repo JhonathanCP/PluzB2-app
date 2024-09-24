@@ -1,11 +1,10 @@
-// src/pages/AdminUsersPage.jsx
-
 import React, { useState, useEffect } from 'react';
 import { Container, Table, Button, Modal, Form, Spinner, Row, Col } from 'react-bootstrap';
 import { getUsers, createUser, updateUser, deleteUser } from '../../api/user.api';
 import { getRoles } from '../../api/role.api';
 import { NavbarComponent } from '../../components/NavbarComponent';
 import { FooterComponent } from '../../components/FooterComponent';
+import { toast } from 'react-hot-toast'; // Importar la librería de notificaciones
 
 export const AdminUsersPage = () => {
     const [users, setUsers] = useState([]);
@@ -31,18 +30,33 @@ export const AdminUsersPage = () => {
     };
 
     const handleSaveUser = async () => {
-        if (selectedUser.id) {
-            await updateUser(selectedUser.id, selectedUser);
-        } else {
-            await createUser(selectedUser);
+        try {
+            if (selectedUser.id) {
+                await updateUser(selectedUser.id, selectedUser);
+                toast.success('Usuario actualizado correctamente.');
+            } else {
+                await createUser(selectedUser);
+                toast.success('Usuario creado correctamente.');
+            }
+            setShowModal(false);
+            window.location.reload(); // Recargar para reflejar cambios
+        } catch (error) {
+            if (error.response && error.response.status === 400) {
+                toast.error(error.response.data.message); // Mostrar mensaje de error desde el backend
+            } else {
+                toast.error('Error al guardar el usuario.');
+            }
         }
-        setShowModal(false);
-        window.location.reload(); // Recargar para reflejar cambios
     };
 
     const handleDeleteUser = async (userId) => {
-        await deleteUser(userId);
-        setUsers(users.filter(user => user.id !== userId));
+        try {
+            await deleteUser(userId);
+            setUsers(users.filter(user => user.id !== userId));
+            toast.success('Usuario eliminado correctamente.');
+        } catch (error) {
+            toast.error('Error al eliminar el usuario.');
+        }
     };
 
     if (loading) {

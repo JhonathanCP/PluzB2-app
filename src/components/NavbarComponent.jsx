@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navbar, Nav, NavDropdown } from 'react-bootstrap';
-import { Link, useNavigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode'; // Corrige la importación
+import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode'; // Asegúrate de que esta importación sea correcta
 import Logo from '../assets/Logo-blanco.png'; // Asegúrate de que la ruta sea correcta
 import { toast } from 'react-hot-toast';
 import { getGroups } from '../api/group.api.js'; // Importa la API para obtener los grupos
@@ -65,7 +65,7 @@ export const NavbarComponent = () => {
 
     return (
         <Navbar variant="dark" expand="lg" className="fixed-top px-5 bg-login">
-            <Navbar.Brand as={Link} to="/menu">
+            <Navbar.Brand onClick={() => navigate("/menu")}>
                 <img
                     src={Logo}
                     width="80"
@@ -77,36 +77,41 @@ export const NavbarComponent = () => {
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="ms-auto">
-                    <Nav.Link as={Link} to="/menu">
+                    <Nav.Link onClick={() => navigate("/menu")}>
                         <i className="bi bi-house-fill"></i> Inicio
                     </Nav.Link>
                     {groups.map((group) => (
-                        <Nav.Link as={Link} onClick={() => navigate(`/client/${id}`)} key={group.id}>
+                        <Nav.Link onClick={() => navigate(`/group/${group.id}`)} key={group.id}>
                             <i className={`bi bi-${group.icon}`}></i> {group.name}
                         </Nav.Link>
                     ))}
                     {isAdmin && ( // Mostrar solo si es administrador
                         <NavDropdown title="Configuración" id="admin-config-dropdown">
-                            <NavDropdown.Item as={Link} to="/admin/user">
+                            <NavDropdown.Item onClick={() => navigate("/admin/user")}>
                                 <i className="bi bi-people-fill"></i> Usuarios
                             </NavDropdown.Item>
-                            <NavDropdown.Item as={Link} to="/admin/locations">
+                            <NavDropdown.Item onClick={() => navigate("/admin/locations")}>
                                 <i className="bi bi-geo-alt-fill"></i> Locaciones
                             </NavDropdown.Item>
-                            <NavDropdown.Item as={Link} to="/admin/groups">
+                            <NavDropdown.Item onClick={() => navigate("/admin/groups")}>
                                 <i className="bi bi-collection-fill"></i> Grupos
                             </NavDropdown.Item>
-                            <NavDropdown.Item as={Link} to="/admin/clients">
+                            <NavDropdown.Item onClick={() => navigate("/admin/clients")}>
                                 <i className="bi bi-briefcase-fill"></i> Clientes
                             </NavDropdown.Item>
-                            <NavDropdown.Item as={Link} to="/admin/section-types">
+                            <NavDropdown.Item onClick={() => navigate("/admin/section-types")}>
                                 <i className="bi bi-bar-chart-steps"></i> Criterios
                             </NavDropdown.Item>
                         </NavDropdown>
                     )}
-                    <span className="nav-link">
-                        <i className="bi bi-person-circle"></i> {username || 'Usuario'}
-                    </span>
+                    
+                    {/* Dropdown para el usuario */}
+                    <NavDropdown title={<><i className="bi bi-person-circle"></i> {username || 'Usuario'}</>} id="user-dropdown">
+                        <NavDropdown.Item onClick={() => navigate("/change-password")}>
+                            <i className="bi bi-key-fill"></i> Cambiar Contraseña
+                        </NavDropdown.Item>
+                    </NavDropdown>
+
                     <Nav.Link onClick={handleLogout}>
                         <i className="bi bi-box-arrow-left"></i> Cerrar sesión
                     </Nav.Link>
