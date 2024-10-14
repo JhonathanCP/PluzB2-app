@@ -90,7 +90,10 @@ export const NavbarComponent = () => {
                             <NavDropdown.Item onClick={() => navigate("/admin/user")}>
                                 <i className="bi bi-people-fill"></i> Usuarios
                             </NavDropdown.Item>
-                            <NavDropdown.Item onClick={() => navigate("/admin/locations")}>
+                            <NavDropdown.Item onClick={() => navigate("/admin/data")}>
+                                <i className="bi bi-database"></i> Datos
+                            </NavDropdown.Item>
+                            {/* <NavDropdown.Item onClick={() => navigate("/admin/locations")}>
                                 <i className="bi bi-geo-alt-fill"></i> Locaciones
                             </NavDropdown.Item>
                             <NavDropdown.Item onClick={() => navigate("/admin/groups")}>
@@ -101,7 +104,7 @@ export const NavbarComponent = () => {
                             </NavDropdown.Item>
                             <NavDropdown.Item onClick={() => navigate("/admin/section-types")}>
                                 <i className="bi bi-bar-chart-steps"></i> Criterios
-                            </NavDropdown.Item>
+                            </NavDropdown.Item> */}
                         </NavDropdown>
                     )}
                     

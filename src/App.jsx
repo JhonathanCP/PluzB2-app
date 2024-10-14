@@ -11,6 +11,7 @@ import { AdminLocationsPage } from './pages/admin/AdminLocationPage';
 import { AdminUsersPage } from './pages/admin/AdminUserPage';
 import { GroupServicesPage } from './pages/user/GroupServicesPage';
 import { ChangePasswordPage } from './pages/user/ChangePasswordPage';
+import { AdminDataPage } from './pages/admin/AdminDataPage';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -36,6 +37,7 @@ function App() {
                         <Route path="/admin/clients" element={<AdminClientsPage />} />
                         <Route path="/admin/section-types" element={<AdminSectionTypesPage />} />
                         <Route path="/admin/locations" element={<AdminLocationsPage />} />
+                        <Route path="/admin/data" element={<AdminDataPage />} />
                     </Route>    
                 </Route>
             </Routes>

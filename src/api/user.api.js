@@ -23,3 +23,4 @@ export const getUser = (userId) => authApi.get(`/${userId}/`);
 export const createUser = (data) => authApi.post('/', data);
 export const updateUser = (id, data) => authApi.put(`/${id}`, data);
 export const deleteUser = (id) => authApi.delete(`/${id}`);
+export const recoverPassword = (id) => authApi.post(`/${id}/recover-password`);

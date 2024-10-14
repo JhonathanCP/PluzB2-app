@@ -757,7 +757,7 @@ body {
 }
 
 .service-card {
-    background-color: var(--color-primary)
+    background-color: var(--color-secondary);
 }
 
 .clickable-card {

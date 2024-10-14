@@ -10,6 +10,7 @@ import { getSectionTypes } from '../../api/sectionType.api.js'; // Para obtener 
 import { getGroups } from '../../api/group.api.js'; // Para obtener el nombre del grupo
 import { getGroupServices } from '../../api/groupservices.api';
 import { getServiceSections } from '../../api/servicesection.api'; // API para ServiceSection
+import { getServiceProfiles } from '../../api/serviceprofile.api.js'; // API para ServiceSection
 import '../../assets/main.css';
 
 export const GroupServiceDetailPage = () => {
@@ -18,20 +19,27 @@ export const GroupServiceDetailPage = () => {
     const [locations, setLocations] = useState([]);
     const [sections, setSections] = useState([]);
     const [sectionTypes, setSectionTypes] = useState([]);
+    const [serviceProfiles, setServiceProfiles] = useState([]);
     const [groupName, setGroupName] = useState('');
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [selectedClient, setSelectedClient] = useState(null);
     const [services, setServices] = useState([]);
     const [serviceDetails, setServiceDetails] = useState([]);
+    const [mapIframe, setMapIframe] = useState(null);
+
 
     useEffect(() => {
         const fetchClientsAndLocationsAndSections = async () => {
             try {
                 // Obtener todos los clientes
                 const clientResponse = await getClients();
-                const filteredClients = clientResponse.data.filter(client => client.groupId === parseInt(groupId));
+                const filteredClients = clientResponse.data.filter(client =>
+                    client.groupId === parseInt(groupId) &&
+                    client.groupServices.some(service => service.id === parseInt(serviceId)) // Asegura que el cliente esté asociado al servicio
+                );
                 setClients(filteredClients);
+
 
                 // Obtener los servicios del grupo
                 const servicesResponse = await getGroupServices();
@@ -61,6 +69,13 @@ export const GroupServiceDetailPage = () => {
                 const groupResponse = await getGroups();
                 const group = groupResponse.data.find(group => group.id === parseInt(groupId));
                 setGroupName(group ? group.name : 'Group');
+
+                // Obtener los detalles del servicio (ServiceSections)
+                const serviceProfilesResponse = await getServiceProfiles();
+                const filteredServiceProfiles = serviceProfilesResponse.data.filter(
+                    serviceProfile => serviceProfile.groupServiceId === parseInt(serviceId)
+                );
+                setServiceProfiles(filteredServiceProfiles);
 
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -99,7 +114,7 @@ export const GroupServiceDetailPage = () => {
         return `rgba(${color.r}, ${color.g}, ${color.b}, 0.3)`;
     };
 
-    const handleShowDetails = (client) => {
+    const handleShowDetails = async (client) => {
         setSelectedClient(client);
         setShowModal(true);
     };
@@ -107,11 +122,6 @@ export const GroupServiceDetailPage = () => {
     const handleCloseModal = () => {
         setShowModal(false);
         setSelectedClient(null);
-    };
-
-    const getLocationName = (locationId) => {
-        const location = locations.find(loc => loc.id === locationId);
-        return location ? location.name : 'Unknown';
     };
 
     const getClientSections = (clientId) => {
@@ -135,6 +145,27 @@ export const GroupServiceDetailPage = () => {
         })).filter(group => group.sections.length > 0);
     };
 
+    const calculateAge = (dob) => {
+        const birthDate = new Date(dob);
+        const ageDifferenceMs = Date.now() - birthDate.getTime();
+        const ageDate = new Date(ageDifferenceMs); // Milisegundos desde el epoch
+        return Math.abs(ageDate.getUTCFullYear() - 1970); // Restamos 1970 para obtener la edad
+    };
+
+    const renderMap = (link) => {
+        return (
+            <iframe
+                src={link}
+                width="100%"
+                height="300vh"
+                style={{ border: '0' }}
+                allowFullScreen
+                loading="lazy">
+            </iframe>
+        );
+    };
+
+
     if (loading) {
         return (
             <div className="text-center p-5">
@@ -150,9 +181,9 @@ export const GroupServiceDetailPage = () => {
                 {services.length > 0 ? (
                     services.map(service => (
                         <Container fluid key={service.id}>
-                            <Card className="service-card ">
+                            <Card className="service-card">
                                 <Card.Body className='p-2'>
-                                    <Card.Title className="text-center text-white">Buyer profile de {service.name}</Card.Title>
+                                    <Card.Title className="text-center">Buyer profile de {service.name}</Card.Title>
                                 </Card.Body>
                             </Card>
                             <section id="service-details">
@@ -160,7 +191,15 @@ export const GroupServiceDetailPage = () => {
                                     <Row>
                                         {/* Columna para el ícono */}
                                         <Col lg={3} md={6} sm={12} className="d-flex align-items-center justify-content-center">
-                                            <i className="bi bi-person-circle" style={{ fontSize: '200px', color: '#3058a1' }}></i>
+                                            <Row className='text-center'>
+                                                <i className="bi bi-person-circle" style={{ fontSize: '200px', color: '#3058a1' }}></i>
+                                                {serviceProfiles.length > 0 ? (
+                                                    serviceProfiles.map(serviceProfile => (
+                                                        <p key={serviceProfile.id}><i className='bi bi-vignette'></i> {serviceProfile.name}: {serviceProfile.description}</p>
+                                                    ))) : (
+                                                    <p className="text-center">No se encontró el detalle del perfil.</p>
+                                                )}
+                                            </Row>
                                         </Col>
 
                                         {/* Columna para las tarjetas */}
@@ -191,7 +230,7 @@ export const GroupServiceDetailPage = () => {
 
                 <Card className="service-card ">
                     <Card.Body className='p-2'>
-                        <Card.Title className="text-center text-white">Buyer profile de Clientes {groupName}</Card.Title>
+                        <Card.Title className="text-center">Detalle de Clientes {groupName}</Card.Title>
                     </Card.Body>
                 </Card>
                 <section id="clients" className='pt-3'>
@@ -200,19 +239,27 @@ export const GroupServiceDetailPage = () => {
                             <tr>
                                 <th>ID</th>
                                 <th>Nombre</th>
-                                <th>Responsable</th>
-                                <th>Ubicación</th>
+                                <th>Alcalde</th>
+                                {/* <th>Ubicación</th> */}
+                                <th>Edad</th>
+                                <th>Partido político</th>
+                                <th>Profesión</th>
+                                <th>Aprobación</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
                             {clients.length > 0 ? (
-                                clients.map(client => (
+                                clients.sort((a, b) => a.id - b.id).map(client => (
                                     <tr key={client.id}>
                                         <td>{client.id}</td>
                                         <td>{client.name}</td>
                                         <td>{client.responsible}</td>
-                                        <td>{getLocationName(client.locationId)}</td>
+                                        {/* <td>{getLocationName(client.locationId)}</td> */}
+                                        <td>{calculateAge(client.dob)}</td>
+                                        <td>{client.politicalParty}</td>
+                                        <td>{client.ocupation}</td>
+                                        <td>{client.approvalRate} %</td>
                                         <td>
                                             <Button onClick={() => handleShowDetails(client)}>Ver detalle</Button>
                                         </td>
@@ -220,7 +267,7 @@ export const GroupServiceDetailPage = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="5" className="text-center">No se encontraron clientes para este grupo.</td>
+                                    <td colSpan="12" className="text-center">No se encontraron clientes para este grupo.</td>
                                 </tr>
                             )}
                         </tbody>
@@ -231,44 +278,53 @@ export const GroupServiceDetailPage = () => {
 
             {/* Modal para mostrar los detalles del cliente */}
             <Modal show={showModal} onHide={handleCloseModal} size="xl" centered>
-                <Modal.Header closeButton>
-                    <Modal.Title>Detalle del Cliente</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    {selectedClient && (
-                        <>
-                            <h5><strong>Nombre:</strong> {selectedClient.name}</h5>
-                            <h5><strong>Responsable:</strong> {selectedClient.responsible}</h5>
-                            <h5><strong>Ubicación:</strong> {getLocationName(selectedClient.locationId)}</h5>
+                {selectedClient && (<>
+                    <Modal.Header closeButton>
+                        <Modal.Title>{selectedClient.name}</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        {/* <h5><strong>Nombre:</strong> {selectedClient.name}</h5> */}
+                        <h5><strong>Alcalde:</strong> {selectedClient.responsible}</h5>
+                        <h5><strong>Edad:</strong> {calculateAge(selectedClient.dob)}</h5>
+                        <h5><strong>Partido político:</strong> {selectedClient.politicalParty}</h5>
+                        <h5><strong>Profesión:</strong> {selectedClient.ocupation}</h5>
+                        <h5><strong>Aprobación:</strong> {selectedClient.approvalRate} %</h5>
+                        <h5><strong>Ubicación:</strong></h5>
+                        <div className='text-center'>
+                            {renderMap(selectedClient.link)}
+                        </div>
+                        <hr></hr>
 
-                            <h5 className="fw-bold">Información clave:</h5>
-                            {getSectionsByType(selectedClient.id).map(group => (
-                                group.sections.length > 0 && (
-                                    <div key={group.sectionType} className="pt-2">
-                                        <h5 className="fw-bold">{group.sectionType}</h5>
-                                        <div className="row g-3 justify-content-center">
-                                            {group.sections.sort((a, b) => b.percepcion - a.percepcion).map(section => (
-                                                <div className="col-lg-4 col-md-6 col-sm-12" key={section.id}>
-                                                    <div className="card h-100" style={{ background: getBackgroundColor(section.percepcion) }}>
-                                                        <div className="card-body">
-                                                            <h5 className="card-title">{section.name}</h5>
-                                                            <p className="card-text"><strong>Percepción:</strong> {section.percepcion}%</p>
-                                                        </div>
+                        <h5 className="fw-bold">Información clave:</h5>
+                        {getSectionsByType(selectedClient.id).map(group => (
+                            group.sections.length > 0 && (
+                                <div key={group.sectionType} className="pt-2">
+                                    <h5 className="fw-bold">{group.sectionType}</h5>
+                                    <div className="row g-3 justify-content-center">
+                                        {group.sections.sort((a, b) => b.percepcion - a.percepcion).map(section => (
+                                            <div className="col-lg-4 col-md-6 col-sm-12" key={section.id}>
+                                                <div className="card h-100" style={{ background: getBackgroundColor(section.percepcion) }}>
+                                                    <div className="card-body">
+                                                        <h5 className="card-title">{section.name}</h5>
+                                                        <p className="card-text"><strong>Percepción:</strong> {section.percepcion}%</p>
                                                     </div>
                                                 </div>
-                                            ))}
-                                        </div>
+                                            </div>
+                                        ))}
                                     </div>
-                                )
-                            ))}
-                        </>
-                    )}
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleCloseModal}>
-                        Cerrar
-                    </Button>
-                </Modal.Footer>
+                                </div>
+                            )
+                        ))}
+
+
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={handleCloseModal}>
+                            Cerrar
+                        </Button>
+                    </Modal.Footer>
+                </>
+                )}
             </Modal>
         </Container>
     );

@@ -46,7 +46,7 @@ export const GroupServicesPage = () => {
                             <Col key={service.id} xs={12} md={6} className="mb-4">
                                 <Card onClick={() => navigate(`/group/${groupId}/service/${service.id}`)} className="service-card clickable-card">
                                     <Card.Body className='p-4'>
-                                        <Card.Title className="text-center text-white">{service.name}</Card.Title>
+                                        <Card.Title className="text-center">{service.name}</Card.Title>
                                     </Card.Body>
                                 </Card>
                             </Col>

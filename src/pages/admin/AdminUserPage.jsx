@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Table, Button, Modal, Form, Spinner, Row, Col } from 'react-bootstrap';
-import { getUsers, createUser, updateUser, deleteUser } from '../../api/user.api';
+import { getUsers, createUser, updateUser, deleteUser, recoverPassword } from '../../api/user.api'; // Añadir recoverPassword
 import { getRoles } from '../../api/role.api';
 import { NavbarComponent } from '../../components/NavbarComponent';
 import { FooterComponent } from '../../components/FooterComponent';
@@ -59,6 +59,15 @@ export const AdminUsersPage = () => {
         }
     };
 
+    const handleRecoverPassword = async () => {
+        try {
+            await recoverPassword(selectedUser.id); // Llamar a la API para recuperar la contraseña
+            toast.success('Nueva contraseña enviada correctamente.');
+        } catch (error) {
+            toast.error('Error al enviar la nueva contraseña.');
+        }
+    };
+
     if (loading) {
         return <Spinner animation="border" />;
     }
@@ -78,7 +87,6 @@ export const AdminUsersPage = () => {
                 <Table responsive striped bordered hover className='mt-3'>
                     <thead>
                         <tr>
-                            {/* <th>ID</th> */}
                             <th>Nombre de Usuario</th>
                             <th>Email</th>
                             <th>Rol</th>
@@ -88,7 +96,6 @@ export const AdminUsersPage = () => {
                     <tbody>
                         {users.map(user => (
                             <tr key={user.id}>
-                                {/* <td>{user.id}</td> */}
                                 <td>{user.username}</td>
                                 <td>{user.email}</td>
                                 <td>{roles.find(role => role.id === user.roleId)?.name}</td>
@@ -146,6 +153,11 @@ export const AdminUsersPage = () => {
                     <Button variant='secondary' onClick={() => setShowModal(false)}>
                         Cerrar
                     </Button>
+                    {selectedUser && selectedUser.id && (
+                        <Button variant='warning' onClick={handleRecoverPassword}>
+                            Enviar nueva contraseña
+                        </Button>
+                    )}
                     <Button variant='primary' onClick={handleSaveUser}>
                         {selectedUser ? 'Guardar Cambios' : 'Crear Usuario'}
                     </Button>
